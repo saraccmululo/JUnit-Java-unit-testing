@@ -1,8 +1,14 @@
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CalculatorTest {
-  Calculator calculator = new Calculator();
+  Calculator calculator;
+
+  @BeforeEach
+  void setUp() {
+    calculator = new Calculator();
+  }
   @Test
   void testAdd() {
     assertEquals(5, calculator.add(2,3));
