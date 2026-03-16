@@ -1,5 +1,7 @@
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CalculatorTest {
@@ -9,35 +11,55 @@ public class CalculatorTest {
   void setUp() {
     calculator = new Calculator();
   }
-  @Test
-  void testAdd() {
-    assertEquals(5, calculator.add(2,3));
-    assertEquals(0, calculator.add(0, 0));
-    assertEquals(-1, calculator.add(-2,1));
-    assertEquals(-5, calculator.add(-6,1));
-  }
-  @Test
-  void testSubtract() {
-    assertEquals(-1, calculator.subtract(2, 3));
-    assertEquals(2, calculator.subtract(2, 0));
-    assertEquals(-3, calculator.subtract(-2, 1));
+
+  @ParameterizedTest
+  @CsvSource({
+      "2,3,5",
+      "3,4,7",
+      "0,0,0",
+      "-2,1,-1"
+  })
+  void testAdd(int a, int b, int expected) {
+    assertEquals(expected, calculator.add(a,b));
   }
 
-  @Test
-  void testMultiply() {
-    assertEquals(6, calculator.multiply(2, 3));
-    assertEquals(0, calculator.multiply(0, 10));
-    assertEquals(-2, calculator.multiply(-1, 2));
+  @ParameterizedTest
+  @CsvSource({
+      "3,2,1",
+      "2,0,2",
+      "-2,1,-3"
+  })
+  void testSubtract(int a, int b, int expected) {
+    assertEquals(expected, calculator.subtract(a,b));
   }
 
-  @Test
-  void testDivide() {
-    assertEquals(2, calculator.divide(6, 3));
-    assertEquals(-3, calculator.divide(6, -2));
+  @ParameterizedTest
+  @CsvSource({
+      "2,3,6",
+      "0,10,0",
+      "-1,2,-2"
+  })
+  void testMultiply(int a, int b, int expected) {
+    assertEquals(expected, calculator.multiply(a,b));
   }
 
-  @Test
-  void testDivideByZero() {
-    assertThrows(IllegalArgumentException.class, () -> calculator.divide(5, 0));
+  @ParameterizedTest
+  @CsvSource({
+      "6,3,2",
+      "6,-2,-3"
+  })
+  void testDivide(int a, int b, int expected) {
+    assertEquals(expected, calculator.divide(a,b));
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+      "5,0",
+      "-10, 0",
+      "0,0"
+  })
+  void testDivideByZero(int a, int b) {
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> calculator.divide(a,b));
+    assertEquals("Cannot divide by zero", exception.getMessage());
   }
 }
