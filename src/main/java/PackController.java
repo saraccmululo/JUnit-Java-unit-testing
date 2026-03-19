@@ -1,3 +1,4 @@
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
@@ -6,21 +7,19 @@ import java.util.NoSuchElementException;
 public class PackController {
 
   private final PackService packService;
-  private final PackRepository packRepository;
 
-  public PackController(PackService packService, PackRepository packRepository) {
+  public PackController(PackService packService) {
     this.packService = packService;
-    this.packRepository = packRepository;
   }
 
   @PostMapping("/{id}/activate")
-  public Pack activatePack(@PathVariable Long id) {
-
-    // Step 1: Get the Pack from the repository
-    Pack pack = packRepository.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("Pack not found with id: " + id));
-
-    // Step 2: Pass the full Pack object to the service
-    return packService.activatePack(pack);
-  }
+  public ResponseEntity<?> activatePack(@PathVariable Long id) {
+    try {
+      Pack pack = packService.activatePackById(id);
+      return ResponseEntity.ok(pack);
+    } catch (NoSuchElementException e) {
+      return ResponseEntity.status(404).body(e.getMessage());
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    } }
 }

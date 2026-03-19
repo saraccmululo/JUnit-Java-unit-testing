@@ -12,6 +12,8 @@ import static org.mockito.Mockito.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.util.Optional;
+
 public class PackServiceTest {
 
   @Mock
@@ -29,35 +31,26 @@ public class PackServiceTest {
     mocks=MockitoAnnotations.openMocks(this);
     pack = new Pack();
     pack.setStatus("IN_RETAILER");
+    pack.setId(1L);
   }
+
   @AfterEach
   void tearDown() throws Exception {
     mocks.close();
   }
 
+  // --- Happy Path ---
   @Test
   void activatedPack_shouldSetStatusToActivated() {
+    when(packRepository.findById(pack.getId())).thenReturn(Optional.of(pack));
     when(packRepository.save(any(Pack.class))).thenReturn(pack);
 
-    Pack result = packService.activatePack(pack);
+    Pack result = packService.activatePackById(pack.getId());
     assertEquals("ACTIVATED", result.getStatus());
-  }
-
-  @Test
-  void activatePack_shouldCallRepositorySave() {
-    when(packRepository.save(any(Pack.class))).thenReturn(pack);
-    packService.activatePack(pack);
     verify(packRepository).save(pack);
   }
 
-  @Test
-  void activatePack_shouldReturnSavedPack() {
-    when(packRepository.save(pack)).thenReturn(pack);
-    Pack result=packService.activatePack(pack);
-    assertNotNull(result);
-    assertEquals(pack, result);
-  }
-
+  // --- Invalid Statuses ---
   @ParameterizedTest
   @CsvSource({
       "IN_WAREHOUSE",
@@ -67,15 +60,19 @@ public class PackServiceTest {
 
   void activatePack_shouldThrowForInvalidStatuses(String status) {
     pack.setStatus(status);
-    Exception exception = assertThrows(IllegalArgumentException.class, ()->packService.activatePack(pack));
+    when(packRepository.findById(pack.getId())).thenReturn(Optional.of(pack));
+    Exception exception = assertThrows(IllegalArgumentException.class, ()->packService.activatePackById(pack.getId()));
     assertEquals("Pack must be in retailer to be activated",
         exception.getMessage());
     verify(packRepository, never()).save(any());
   }
 
+  // --- Pack Not Found ---
   @Test
-  void activatePack_shouldThrowExceptionWhenPackIsNull(){
-    Exception exception = assertThrows(IllegalArgumentException.class, () -> packService.activatePack(null));
-    assertEquals("Pack cannot be null", exception.getMessage());
+  void activatePack_shouldThrowIfPackNotFound(){
+    when(packRepository.findById(999L)).thenReturn(Optional.empty());
+    Exception exception = assertThrows(java.util.NoSuchElementException.class,
+        () -> packService.activatePackById(999L));
+    assertEquals("Pack not found with id: 999", exception.getMessage());
   }
 }
