@@ -10,14 +10,17 @@ public class Pack {
 
   private String status;
 
+  private Long gameId;
+
   @OneToMany(mappedBy="pack")//points to the pack field in Tickets table which contains the foreign key
   private List<Ticket> tickets;
 
   // Constructors
   public Pack() {}
-  public Pack(Long id, String status) {
-    this.packId = id;
+  public Pack(Long packId, String status, Long gameId) {
+    this.packId = packId;
     this.status = status;
+    this.gameId = gameId;
   }
 
   // Getters and setters
@@ -31,6 +34,8 @@ public class Pack {
   public void setStatus(String status) {
     this.status = status;
   }
+
+  public Long getGameId() { return gameId; }
 
   public List<Ticket> getTickets() { return tickets; }//read all tickets of this pack
   public void setTickets(List<Ticket> tickets) { this.tickets = tickets; }//assign a list of tickets when creating a new pack
