@@ -1,9 +1,12 @@
 package com.sara.unittestingpractice.controller;
 
+import com.sara.unittestingpractice.dto.PackDTO;
 import com.sara.unittestingpractice.entity.Pack;
 import com.sara.unittestingpractice.service.PackService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -16,14 +19,36 @@ public class PackController {
     this.packService = packService;
   }
 
-  @PostMapping("/{id}/activate")
-  public ResponseEntity<?> activatePack(@PathVariable Long id) {
+  // GET API: List all packs for retailer
+  @GetMapping("retailer/{retailerId}")
+  public List<PackDTO> getRetailerPacks(@PathVariable Long retailerId){
+    List<Pack> packs = packService.getPacksByRetailer(retailerId);
+    //return only safe fields
+    return packs.stream()
+        .map(pack -> new PackDTO(pack.getPackId(), pack.getGameId(), pack.getStatus()))
+        .toList();
+  }
+
+  // POST API: Activate a pack
+  @PostMapping("/{packId}/activate")
+  public ResponseEntity<?> activatePack(@PathVariable Long packId) {
     try {
-      Pack pack = packService.activatePackById(id);
-      return ResponseEntity.ok(pack);
+      Pack pack = packService.activatePackById(packId);
+
+      PackDTO dto = new PackDTO(
+          pack.getPackId(),
+          pack.getGameId(),
+          pack.getStatus()
+      );
+
+      return ResponseEntity.ok(dto);
+
     } catch (NoSuchElementException e) {
       return ResponseEntity.status(404).body(e.getMessage());
+
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body(e.getMessage());
-    } }
+    }
+  }
 }
+
