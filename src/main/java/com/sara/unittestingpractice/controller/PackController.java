@@ -32,7 +32,6 @@ public class PackController {
   // POST API: Activate a pack
   @PostMapping("/{packId}/activate")
   public ResponseEntity<?> activatePack(@PathVariable Long packId) {
-    try {
       Pack pack = packService.activatePackById(packId);
 
       PackDTO dto = new PackDTO(
@@ -40,15 +39,7 @@ public class PackController {
           pack.getGameId(),
           pack.getStatus()
       );
-
       return ResponseEntity.ok(dto);
-
-    } catch (NoSuchElementException e) {
-      return ResponseEntity.status(404).body(e.getMessage());
-
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
     }
-  }
 }
 
