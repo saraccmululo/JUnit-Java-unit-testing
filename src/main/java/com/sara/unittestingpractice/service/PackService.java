@@ -21,10 +21,10 @@ public class PackService {
   public Pack activatePackById(Long id) {
 
     Pack pack = packRepository.findById(id)
-        .orElseThrow(()-> new NoSuchElementException("com.sara.unittestingpractice.entity.Pack not found with id: " +id));
+        .orElseThrow(()-> new NoSuchElementException("Pack not found with id: " + id));
 
     if(!"IN_RETAILER".equals(pack.getStatus())){ //check if status is not "IN_RETAILER"
-      throw new IllegalArgumentException("com.sara.unittestingpractice.entity.Pack must be in retailer to be activated");
+      throw new IllegalArgumentException("Pack must be in retailer to be activated");
     }
 
     pack.setStatus("ACTIVATED"); //change status to activated
