@@ -15,6 +15,10 @@ public class Pack {
   @OneToMany(mappedBy="pack")//points to the pack field in Tickets table which contains the foreign key
   private List<Ticket> tickets;
 
+  @ManyToOne
+  @JoinColumn(name="retailer_id")
+  private Retailer retailer;
+
   // Constructors
   public Pack() {}
   public Pack(Long packId, String status, Long gameId) {
