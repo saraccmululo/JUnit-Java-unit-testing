@@ -9,8 +9,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.NoSuchElementException;
+
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.anyLong;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -27,8 +28,7 @@ public class PackControllerTest {
   @Test
   void activatePack_shouldReturn200_whenSuccess() throws Exception {
 
-    Pack pack = new Pack();
-    pack.setStatus("ACTIVATED");
+    Pack pack = new Pack(1L, "ACTIVATED", 100L);
 
     when(packService.activatePackById(1L)).thenReturn(pack);
 
@@ -41,23 +41,23 @@ public class PackControllerTest {
   @Test
   void activatePack_shouldReturn404_whenPackNotFound() throws Exception {
 
-    when(packService.activatePackById(anyLong()))
-        .thenThrow(new java.util.NoSuchElementException("com.sara.unittestingpractice.entity.Pack not found with id: 1"));
+    when(packService.activatePackById(1L))
+        .thenThrow(new NoSuchElementException("Pack not found with id: 1"));
 
     mockMvc.perform(post("/packs/1/activate"))
         .andExpect(status().isNotFound())
-        .andExpect(content().string("com.sara.unittestingpractice.entity.Pack not found with id: 1"));
+        .andExpect(content().string("Pack not found with id: 1"));
   }
 
   // INVALID STATUS (400)
   @Test
   void activatePack_shouldReturn400_whenInvalidStatus() throws Exception {
 
-    when(packService.activatePackById(anyLong()))
-        .thenThrow(new IllegalArgumentException("com.sara.unittestingpractice.entity.Pack must be in retailer to be activated"));
+    when(packService.activatePackById(1L))
+        .thenThrow(new IllegalArgumentException("Pack must be in retailer to be activated"));
 
     mockMvc.perform(post("/packs/1/activate"))
         .andExpect(status().isBadRequest())
-        .andExpect(content().string("com.sara.unittestingpractice.entity.Pack must be in retailer to be activated"));
+        .andExpect(content().string("Pack must be in retailer to be activated"));
   }
 }
