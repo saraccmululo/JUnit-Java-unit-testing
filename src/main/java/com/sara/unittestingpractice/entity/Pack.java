@@ -43,6 +43,9 @@ public class Pack {
 
   public List<Ticket> getTickets() { return tickets; }//read all tickets of this pack
   public void setTickets(List<Ticket> tickets) { this.tickets = tickets; }//assign a list of tickets when creating a new pack
+
+  public Retailer getRetailer() { return retailer; }
+  public void setRetailer(Retailer retailer) { this.retailer = retailer;}
 }
 
 
