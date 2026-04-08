@@ -16,6 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,7 +35,7 @@ public class PackServiceTest {
     pack = new Pack(1L,"IN_RETAILER", 100L);
   }
 
-  // --- Happy Path ---
+  // ---Activate pack / Happy Path ---
   @Test
   void activatedPack_shouldSetStatusToActivated() {
     when(packRepository.findById(pack.getPackId())).thenReturn(Optional.of(pack));
@@ -69,5 +70,33 @@ public class PackServiceTest {
     Exception exception = assertThrows(java.util.NoSuchElementException.class,
         () -> packService.activatePackById(999L));
     assertEquals("Pack not found with id: 999", exception.getMessage());
+  }
+
+  //---Find Retailer Packs / Happy Path ---
+  @Test
+  void getPacksByRetailer_shouldReturnListOfPacks() {
+    Long retailerId = 1L;
+    //create a list of packs to be returned
+    List<Pack> mockPacks = List.of(
+        new Pack(1L, "IN_RETAILER", 32L),
+        new Pack(2L, "SHIPPED", 28L),
+        new Pack(3L, "ACTIVATED", 11L)
+    );
+    when(packRepository.findByRetailerId(retailerId)).thenReturn(mockPacks);
+    List<Pack> result = packService.getPacksByRetailer(retailerId);
+    assertEquals(3, result.size());
+    assertEquals(mockPacks, result);
+    //verify if packRepository.findByRetailerId() was called
+    verify(packRepository).findByRetailerId(retailerId);
+  }
+
+  // ---Find Retailer Packs / Pack List not Found --
+
+  @Test
+  void getPacksByRetailer_shouldReturnEmptyListIfNoPacks() {
+    when(packRepository.findByRetailerId(1L)).thenReturn(List.of());
+    List<Pack> result = packService.getPacksByRetailer(1L);
+    assertTrue(result.isEmpty());
+    verify(packRepository).findByRetailerId(1L);
   }
 }
