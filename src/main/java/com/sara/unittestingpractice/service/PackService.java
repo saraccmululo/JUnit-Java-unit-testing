@@ -23,10 +23,17 @@ public class PackService {
     Pack pack = packRepository.findById(id)
         .orElseThrow(()-> new NoSuchElementException("Pack not found with id: " + id));
 
+
+    if ("ACTIVATED".equals(pack.getStatus())) { //check if pa ck was already activated
+      throw new IllegalStateException("Pack is already activated");
+    }
+
     if(!"IN_RETAILER".equals(pack.getStatus())){ //check if status is not "IN_RETAILER"
       throw new IllegalArgumentException("Pack must be in retailer to be activated");
     }
 
     pack.setStatus("ACTIVATED"); //change status to activated
-    return packRepository.save(pack);} //saving using the repository and returning pack
+    return packRepository.save(pack);
+  } //saving using the repository and returning pack
+
 }
