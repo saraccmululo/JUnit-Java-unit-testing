@@ -8,7 +8,8 @@ public class Pack {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long packId;
 
-  private String status;
+  @Enumerated(EnumType.STRING)
+  private PackStatus status;
 
   private Long gameId;
 
@@ -21,7 +22,7 @@ public class Pack {
 
   // Constructors
   public Pack() {}
-  public Pack(Long packId, String status, Long gameId) {
+  public Pack(Long packId, PackStatus status, Long gameId) {
     this.packId = packId;
     this.status = status;
     this.gameId = gameId;
@@ -32,10 +33,10 @@ public class Pack {
     return packId;
   }
 
-  public String getStatus() {
+  public PackStatus getStatus() {
     return status;
   }
-  public void setStatus(String status) {
+  public void setStatus(PackStatus status) {
     this.status = status;
   }
 
